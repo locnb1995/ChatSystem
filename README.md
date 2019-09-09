@@ -1,6 +1,8 @@
 # ChatSystem
 
 # - Description : 
+# Node : 10.15.3
+# Npm : 6.4.1
 # UI : ReactJS 
 # Server : Nodejs(Express, Socket-io, MongoDB, TypeScript).
 
