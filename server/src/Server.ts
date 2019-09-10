@@ -1,30 +1,37 @@
-import * as express from "express";
-import * as socket from 'socket.io';
-import * as http from 'http';
+import * as express_module from "express";
+import * as socket_module from 'socket.io';
+import * as http_module from 'http';
+import Config from './Model/Config';
+import UserController from './Controller/UserController';
+import SocketController from './Controller/SocketController';
+
 export default class Server{
 
-    private app: express.Application;
-    private http: http.Server;
-    private io: socket.Server;
+    private app: express_module.Express;
+    private http: http_module.Server;
+    private io: socket_module.Server;
     private port: Number;
+    private userController: UserController;
+    private socketController: SocketController;
 
     constructor(){
-        this.app = express();
-        this.http = http.createServer(this.app);
-        this.io = socket(this.http);
+        this.app = express_module();
+        this.http = http_module.createServer(this.app);
+        this.io = socket_module(this.http);
         this.port = Number(process.env.PORT) || 3300;
+        this.userController = new UserController(this.app);
+        this.socketController = new SocketController(this.io);
     }
 
     start(): void{
 
-        this.app.listen(this.port, () => console.log('Server listening at port : ' + this.port));
+        Config.getConfigServer(this.app);
 
-        this.app.get('/', function(req, res){
-            res.send('<h1>Hello world</h1>');
-        });
+        this.http.listen(this.port, () => console.log('Server listening at port : ' + this.port)); //start Server
 
-        this.io.on('connection', function(socket : socket.Socket){
-            console.log('user' + socket.id + ' connected');
-        });
+        this.userController.startUserThread();
+
+        this.socketController.startSocketThread();
+
     }
 }
